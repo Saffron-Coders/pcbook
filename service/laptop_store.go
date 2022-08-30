@@ -26,7 +26,7 @@ func NewInMemoryLaptopStore() *InMemoryLaptopStore {
 	}
 }
 
-func (store InMemoryLaptopStore) Save(laptop *pb.Laptop) error {
+func (store *InMemoryLaptopStore) Save(laptop *pb.Laptop) error {
 	store.mutex.Lock()
 	defer store.mutex.Unlock()
 

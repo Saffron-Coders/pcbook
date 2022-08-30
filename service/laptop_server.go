@@ -15,8 +15,8 @@ type LaptopServer struct {
 	Store LaptopStore
 }
 
-func NewLaptopServer() *LaptopServer {
-	return &LaptopServer{}
+func NewLaptopServer(store LaptopStore) *LaptopServer {
+	return &LaptopServer{store}
 }
 
 func (server *LaptopServer) CreateLaptop(ctx context.Context, req *pb.CreateLaptopRequest) (*pb.CreateLaptopResponse, error) {
@@ -27,14 +27,14 @@ func (server *LaptopServer) CreateLaptop(ctx context.Context, req *pb.CreateLapt
 		// check if it's a valid UUID
 		_, err := uuid.Parse(laptop.Id)
 		if err != nil {
-			return nil, status.Errorf(codes.InvalidArgument, "laptop id is not a valid UUID: %v", err)
-		} else {
-			id, err := uuid.NewRandom()
-			if err != nil {
-				return nil, status.Errorf(codes.Internal, "cannot generate a new UUID: %v", err)
-			}
-			laptop.Id = id.String()
+			return nil, status.Errorf(codes.InvalidArgument, "laptop ID is not a valid UUID: %v", err)
 		}
+	} else {
+		id, err := uuid.NewRandom()
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "cannot generate a new laptop ID: %v", err)
+		}
+		laptop.Id = id.String()
 	}
 
 	// Save the laptop to in
