@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"time"
 
 	"github.com/google/uuid"
 	"gitlab.techschool/pcbook/pb"
@@ -38,7 +37,7 @@ func (server *LaptopServer) CreateLaptop(ctx context.Context, req *pb.CreateLapt
 		laptop.Id = id.String()
 	}
 	// some heavy processing
-	time.Sleep(time.Second * 6)
+	// time.Sleep(time.Second * 6)
 
 	if ctx.Err() == context.Canceled {
 		log.Print("request is canceled")
