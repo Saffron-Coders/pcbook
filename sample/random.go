@@ -11,6 +11,7 @@ import (
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
+
 func randomKeyboardLayout() pb.Keyboard_Layout {
 	switch rand.Intn(3) {
 	case 1:
