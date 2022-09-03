@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"sync"
-	"time"
 
 	"github.com/jinzhu/copier"
 	"gitlab.techschool/pcbook/pb"
@@ -62,19 +61,22 @@ func (store *InMemoryLaptopStore) Find(id string) (*pb.Laptop, error) {
 	return deepCopy(laptop)
 }
 
-func (store *InMemoryLaptopStore) Search(ctx context.Context, filter *pb.Filter, found func(laptop *pb.Laptop) error) error {
+func (store *InMemoryLaptopStore) Search(
+	ctx context.Context,
+	filter *pb.Filter,
+	found func(laptop *pb.Laptop) error,
+) error {
 	store.mutex.RLock()
 	defer store.mutex.RUnlock()
 
 	for _, laptop := range store.data {
-		// heavy processing
-		time.Sleep(time.Second)
-		log.Print("checking laptop id: ", laptop.GetId())
-
 		if ctx.Err() == context.Canceled || ctx.Err() == context.DeadlineExceeded {
-			log.Print("context is canceled")
-			return errors.New("context is canceled")
+			log.Print("context is cancelled")
+			return nil
 		}
+
+		// time.Sleep(time.Second)
+		// log.Print("checking laptop id: ", laptop.GetId())
 
 		if isQualified(filter, laptop) {
 			other, err := deepCopy(laptop)
