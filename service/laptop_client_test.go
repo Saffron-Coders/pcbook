@@ -118,7 +118,7 @@ func startTestLaptopServer(t *testing.T, store service.LaptopStore) (*service.La
 	listener, err := net.Listen("tcp", ":0")
 	require.NoError(t, err)
 
-	go grpcServer.Serve(listener) //block call so run as routine
+	go grpcServer.Serve(listener) // block call so run as routine
 
 	return laptopServer, listener.Addr().String()
 }
