@@ -92,3 +92,7 @@ func (server *LaptopServer) SearchLaptop(req *pb.SearchLaptopRequest, stream pb.
 
 	return nil
 }
+
+func (server *LaptopServer) UploadImage(srv pb.LaptopService_UploadImageServer) error {
+	return nil
+}
