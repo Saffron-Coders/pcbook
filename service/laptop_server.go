@@ -44,14 +44,8 @@ func (server *LaptopServer) CreateLaptop(ctx context.Context, req *pb.CreateLapt
 	// some heavy processing
 	// time.Sleep(time.Second * 6)
 
-	if ctx.Err() == context.Canceled {
-		log.Print("request is canceled")
-		return nil, status.Error(codes.Canceled, "request is canceled")
-	}
-
-	if ctx.Err() == context.DeadlineExceeded {
-		log.Print("deadline is exceeded")
-		return nil, status.Error(codes.DeadlineExceeded, "deadline is exceeded")
+	if err := contextError(ctx); err != nil {
+		return nil, err
 	}
 
 	// Save the laptop to in
@@ -122,6 +116,10 @@ func (server *LaptopServer) UploadImage(stream pb.LaptopService_UploadImageServe
 	imageSize := 0
 
 	for {
+		if err := contextError(stream.Context()); err != nil {
+			return err
+		}
+
 		log.Print("waiting to receive more data")
 
 		req, err := stream.Recv()
@@ -137,10 +135,14 @@ func (server *LaptopServer) UploadImage(stream pb.LaptopService_UploadImageServe
 		chunk := req.GetChunkData()
 		size := len(chunk)
 
+		log.Printf("received a chunk with size: %d", size)
+
 		imageSize += size
 		if imageSize > maxImageSize {
 			return logError(status.Errorf(codes.InvalidArgument, "image is too large: %d > %d", imageSize, maxImageSize))
 		}
+
+		// time.Sleep(time.Second)
 
 		_, err = imageData.Write(chunk)
 		if err != nil {
@@ -165,6 +167,17 @@ func (server *LaptopServer) UploadImage(stream pb.LaptopService_UploadImageServe
 
 	log.Printf("save image with id: %s, size: %d", imageID, imageSize)
 	return nil
+}
+
+func contextError(ctx context.Context) error {
+	switch ctx.Err() {
+	case context.Canceled:
+		return logError(status.Error(codes.Canceled, "request is canceled"))
+	case context.DeadlineExceeded:
+		return logError(status.Error(codes.DeadlineExceeded, "deadline is exceeded"))
+	default:
+		return nil
+	}
 }
 
 func logError(err error) error {
