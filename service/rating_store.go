@@ -23,5 +23,21 @@ func NewInMemoryRatingStore() *InMemoryRatingStore {
 }
 
 func (store *InMemoryRatingStore) Add(laptopID string, score float64) (*Rating, error) {
-	return nil, nil
+	store.mutex.Lock()
+	defer store.mutex.Unlock()
+
+	rating := store.rating[laptopID]
+	if rating == nil {
+		rating = &Rating{
+			Count: 1,
+			Sum:   score,
+		}
+	} else {
+		rating.Count++
+		rating.Sum += score
+	}
+
+	store.rating[laptopID] = rating
+
+	return rating, nil
 }
