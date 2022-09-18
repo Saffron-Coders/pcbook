@@ -109,7 +109,7 @@ func (server *LaptopServer) UploadImage(stream pb.LaptopService_UploadImageServe
 	}
 
 	if laptop == nil {
-		return logError(status.Errorf(codes.InvalidArgument, "laptop %s doesn't exist: %v", laptopId))
+		return logError(status.Errorf(codes.InvalidArgument, "laptop id %s doesn't exist", laptopId))
 	}
 
 	imageData := bytes.Buffer{}
